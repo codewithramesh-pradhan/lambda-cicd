@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'S3 bucket for out CICD PR'
+Description: 'S3 bucket for our CI/CD PR testing'
 
 Parameters:
   Environment:
@@ -9,6 +9,7 @@ Parameters:
       - test
       - staging
       - production
+    Description: 'The environment for the bucket (e.g., test, staging, production)'
 
 Resources:
   MyS3Bucket:
@@ -17,10 +18,11 @@ Resources:
       BucketName: !Sub '${AWS::StackName}-${Environment}-bucket'
       Tags:
         - Key: Environment
-          Value: !Ref Environment  
-        - Key: Environment
+          Value: !Ref Environment
+        - Key: Project  # Changed from duplicate 'Environment' key
           Value: GithubActionsTesting
+
 Outputs:
   BucketName:
-    Description: 'Name of created S3 Bucket'
+    Description: 'Name of the created S3 Bucket'
     Value: !Ref MyS3Bucket
