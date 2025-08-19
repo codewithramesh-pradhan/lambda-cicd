@@ -29,7 +29,17 @@ jobs:
       - name: Deploy our stack
         run: |
           stack_name="pr-test-stack-${{ github.event.pull_request.number }}"
-          aws cloudformation create-stack --stack-name $stack_name --template-body file://cloudformation/s3-bucket.yml --parameters ParameterKey=Environment,ParameterValue=Test  # Completed example parameter; adjust as needed
+          aws cloudformation create-stack --stack-name $stack_name --template-body file://cloudformation/s3-bucket.yml --parameters ParameterKey=Environment,ParameterValue=test  # Changed to lowercase 'test'
+
+      - name: Wait for Stack Creation  # Added to verify deployment success before proceeding
+        run: |
+          stack_name="pr-test-stack-${{ github.event.pull_request.number }}"
+          aws cloudformation wait stack-create-complete --stack-name $stack_name
+          status=$(aws cloudformation describe-stacks --stack-name $stack_name --query "Stacks[0].StackStatus" --output text)
+          if [[ "$status" != "CREATE_COMPLETE" ]]; then
+            echo "Stack failed: $status"
+            exit 1
+          fi
 
       - name: Comment on the PR
         uses: actions/github-script@v7  # Updated to latest version
@@ -58,3 +68,4 @@ jobs:
         run: |
           stack_name="pr-test-stack-${{ github.event.pull_request.number }}"
           aws cloudformation delete-stack --stack-name $stack_name
+          aws cloudformation wait stack-delete-complete --stack-name $stack_name
