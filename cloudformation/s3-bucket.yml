@@ -15,12 +15,12 @@ Resources:
   MyS3Bucket:
     Type: 'AWS::S3::Bucket'
     Properties:
-      BucketName: !Sub '${AWS::StackName}-${Environment}-bucket'
+      BucketName: !Sub '${AWS::StackName}-${Environment}-bucket-${AWS::AccountId}'  # Adds account ID for uniqueness
       Tags:
         - Key: Environment
           Value: !Ref Environment
         - Key: Project  # Changed from duplicate 'Environment' key
-          Value: GithubActionsTesting
+          Value: GitHubActionsTesting  # Standardized capitalization for consistency
 
 Outputs:
   BucketName:
